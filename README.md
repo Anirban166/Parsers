@@ -36,10 +36,10 @@ Follow(C)  = {(First(B') - ε), Follow(B)} = {*, +, $, )}
 ```
 With the aforementioned knowledge, we can now proceed to make the parsing table for our predictive parser:
 ```
-rule 1 => First(A) => {id, (}
+rule 1 => First(A) => {(, id}
 rule 2 => First(A' -> +BA') => {+}
 rule 3 => Follow(A') => {$, )}
-rule 4 => First(C) => {(, id}
+rule 4 => First(B) => {(, id}
 rule 5 => First(B' -> *CB') => {*}
 rule 6 => Follow(B') => {+, $, )} 
 rule 7 => First(C -> (A)) => {(}
