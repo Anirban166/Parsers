@@ -74,11 +74,40 @@ Then, we'll need to find the first and follow for all the variables:
 First(A) = First(B) = First(C) = {(, id}
 ```
 ```
-Follow(A) = {$, +, )}                      => reduce rules 1 & 2 (r1, r2)
-Follow(B) = {*, Follow(A)} = {*, $, +, )}  => reduce rules 3 & 4 (r3, r4)
-Follow(C) = {Follow(B)} = {*, $, +, )}     => reduce rules 5 & 6 (r5, r6)
+Follow(A) = {$, +, )}
+Follow(B) = {*, Follow(A)} = {*, $, +, )}
+Follow(C) = {Follow(B)} = {*, $, +, )}
 ```
 Finally, we can now construct the parsing table based on the above information:
+
+| State | id       | +        | *        | (          | )           | $         | A | B | C  |
+|-------|----------|----------|----------|------------|-------------|-----------|---|---|----|
+| 0     | s5       |          |          | s4         |             |           | 1 | 2 | 3  |
+| 1     |          | s6       |          |            |             | acc       |   |   |    |
+| 2     | r2       | r2       | s7/r2    | r2         | r2          | r2        |   |   |    |
+| 3     | r4       | r4       | r4       | r4         | r4          | r4        |   |   |    |
+| 4     | s5       |          |          | s4         |             |           | 8 | 2 | 3  |
+| 5     | r6       | r6       | r6       | r6         | r6          | r6        |   |   |    |
+| 6     | s5       |          |          | s4         |             |           |   | 9 | 3  |
+| 7     | s5       |          |          | s4         |             |           |   |   | 10 |
+| 8     |          | s6       |          |            | s11         |           |   |   |    |
+| 9     | r1       | r1       | s7/r1    | r1         | r1          | r1        |   |   |    |
+| 10    | r3       | r3       | r3       | r3         | r3          | r3        |   |   |    |
+| 11    | r5       | r5       | r5       | r5         | r5          | r5        |   |   |    |
+
+Note that:
+- Columns 2-7 (under the terminals) are the actions (shift(s)/reduce(r)) and columns 8-10 (under the variables) are the goto entries.
+- Since there are shift reduce conflicts (s7/r1 & s7/r2), the considered grammar cannot be accepted by an LR(0) parser. 
+
+### SLR(1) Parser
+
+An SLR(1) parsing table is different from the equivalent LR(0) table by the reduce actions contained therein, which are specifically enlisted for the follow of the variable on the left hand side of each production rule, instead of the entire row (as seen in an LR(0) parsing table): 
+
+```
+Follow(LHS(A -> A + B | B)) => Follow(A) = {$, +, )}     => reduce rules 1 & 2 (r1, r2)
+Follow(LHS(B -> B * C | C)) => Follow(B) = {*, $, +, )}  => reduce rules 3 & 4 (r3, r4)
+Follow(LHS(C -> (A) | id))  => Follow(C) = {*, $, +, )}  => reduce rules 5 & 6 (r5, r6)
+```
 
 | State | id       | +        | *        | (          | )           | $         | A | B | C  |
 |-------|----------|----------|----------|------------|-------------|-----------|---|---|----|
@@ -94,9 +123,3 @@ Finally, we can now construct the parsing table based on the above information:
 | 9     |          | r1       | s7       |            | r1          | r1        |   |   |    |
 | 10    |          | r3       | r3       |            | r3          | r3        |   |   |    |
 | 11    |          | r5       | r5       |            | r5          | r5        |   |   |    |
-
-Columns 2-7 (under the terminals) are the actions (shift(s)/reduce(r)) and columns 8-10 (under the variables) are the goto entries.
-
-### SLR(1) Parser
-
-> coming soon
