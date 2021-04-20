@@ -14,10 +14,10 @@ First, we need to remove the left recursion (rules of the form `A -> Aα | B` ne
 Thus, the production rules of our considered grammar after elimination of left recursion are:
 ```
 A  -> BA'         ...rule 1
-A' -> +BA' | ε    ...rules 2 and 3
+A' -> +BA' | ε    ...rules 2 & 3
 B  -> CB'         ...rule 4
-B' -> *CB' | ε    ...rules 5 and 6
-C  -> (A)  | id   ...rules 7 and 8
+B' -> *CB' | ε    ...rules 5 & 6
+C  -> (A)  | id   ...rules 7 & 8
 ```
 Note the inclusion of new variables `A'` and `B'`, making `V = {A, A', B, B', C}`.
 
@@ -55,5 +55,48 @@ rule 8 => First(C -> id) => {id}
 | C  | C -> id  | C -> (A) |          |            |             |           |
 
 ### LR(0) Parser
+
+The production rules of our considered grammar are:
+```
+A -> A + B  ...rule 1
+A -> B      ...rule 2
+B -> B * C  ...rule 3
+B -> C      ...rule 4
+C -> (A)    ...rule 5
+C -> id     ...rule 6
+```
+
+In order to construct an LR(0) parser, we need to first augment the start symbol (`A` here) and find the canonical collection of LR(0) items: (i<sub>0</sub> to i<sub>11</sub>)
+<img src = "img/CanonicalItems.png">
+
+Then, we'll need to find the first and follow for all the variables:
+```
+First(A) = First(B) = First(C) = {(, id}
+```
+```
+Follow(A) = {$, +, )}                      => reduce rules 1 & 2 (r1, r2)
+Follow(B) = {*, Follow(A)} = {*, $, +, )}  => reduce rules 3 & 4 (r3, r4)
+Follow(C) = {Follow(B)} = {*, $, +, )}     => reduce rules 5 & 6 (r5, r6)
+```
+Finally, we can now construct the parsing table based on the above information:
+
+| State | id       | +        | *        | (          | )           | $         | A | B | C  |
+|-------|----------|----------|----------|------------|-------------|-----------|---|---|----|
+| 0     | s5       |          |          | s4         |             |           | 1 | 2 | 3  |
+| 1     |          | s6       |          |            |             | acc       |   |   |    |
+| 2     |          | r2       | s7       |            | r2          | r2        |   |   |    |
+| 3     |          | r4       | r4       |            | r4          | r4        |   |   |    |
+| 4     | s5       |          |          | s4         |             |           | 8 | 2 | 3  |
+| 5     |          | r6       | r6       |            | r6          | r6        |   |   |    |
+| 6     | s5       |          |          | s4         |             |           |   | 9 | 3  |
+| 7     | s5       |          |          | s4         |             |           |   |   | 10 |
+| 8     |          | s6       |          |            | s11         |           |   |   |    |
+| 9     |          | r1       | s7       |            | r1          | r1        |   |   |    |
+| 10    |          | r3       | r3       |            | r3          | r3        |   |   |    |
+| 11    |          | r5       | r5       |            | r5          | r5        |   |   |    |
+
+Columns 2-7 (under the terminals) are the actions (shift(s)/reduce(r)) and columns 8-10 (under the variables) are the goto entries.
+
+### SLR(1) Parser
 
 > coming soon
