@@ -13,11 +13,11 @@ First, we need to remove the left recursion (rules of the form `A -> Aα | B` ne
 
 Thus, the production rules of our considered grammar after elimination of left recursion are:
 ```
-A -> BA'         ...rule 1
-A' -> +BA' | ε   ...rules 2 and 3
-B -> CB'         ...rule 4
-B' -> *CB' | ε   ...rules 5 and 6
-C -> (A) | id    ...rules 7 and 8
+A  -> BA'         ...rule 1
+A' -> +BA' | ε    ...rules 2 and 3
+B  -> CB'         ...rule 4
+B' -> *CB' | ε    ...rules 5 and 6
+C  -> (A)  | id   ...rules 7 and 8
 ```
 Note the inclusion of new variables `A'` and `B'`, making `V = {A, A', B, B', C}`.
 
