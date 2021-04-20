@@ -8,7 +8,7 @@ Production rules, P: A -> A + B | B
 Start symbol, S = A
 ```
 
-### Predictive Parser 
+### LL(1) Parser 
 First, we need to remove the left recursion (rules of the form `A -> Aα | B` need to be substituted with `A -> BA'` and `A' -> αA' | ε`) prevalent in the first two production rules, i.e., `A -> A + B | B` will be `A -> BA'` plus `A' -> +BA' | ε` and likewise, `B -> B * C | C` will be `B -> CB'` plus `B' -> *CB' | ε`.
 
 Thus, the production rules of our considered grammar after elimination of left recursion are:
@@ -46,10 +46,14 @@ rule 7 => First(C -> (A)) => {(}
 rule 8 => First(C -> id) => {id}
 ```
 
-|    | id       | (        | )        | +          | *          | $         |
-|----|----------|----------|----------|------------|------------|-----------|
-| A  | A -> BA' | A -> BA' |          |            |            |           |
-| A' |          |          | A' -> ε  | A' -> +BA' |            |  A' -> ε  |
-| B  | B -> CB' | B -> CB' |          |            |            |           |
+|    | id       | (        | )        | +          | *           | $         |
+|----|----------|----------|----------|------------|-------------|-----------|
+| A  | A -> BA' | A -> BA' |          |            |             |           |
+| A' |          |          | A' -> ε  | A' -> +BA' |             |  A' -> ε  |
+| B  | B -> CB' | B -> CB' |          |            |             |           |
 | B' |          |          | B' -> ε  |  B' -> ε   | B' -> \*CB' |  B' -> ε  |
-| C  | C -> id  | C -> (A) |          |            |            |           |
+| C  | C -> id  | C -> (A) |          |            |             |           |
+
+### LR(0) Parser
+
+> coming soon
